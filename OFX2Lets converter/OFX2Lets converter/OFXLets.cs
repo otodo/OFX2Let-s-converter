@@ -97,6 +97,7 @@ namespace OFX2Lets
                     k++;
                     Array.Resize<journalBook>(ref amountdata, k + 1);
                 }
+
                 if (alldata[i] == "</BANKTRANLIST>")
                 {
                     while (i < alldata.Length)
