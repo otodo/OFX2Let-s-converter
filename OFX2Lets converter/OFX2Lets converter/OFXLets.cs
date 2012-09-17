@@ -66,7 +66,7 @@ namespace OFX2Lets
             int l = 0;
             while (i < alldata.Length)
             {
-                if (Regex.IsMatch(alldata[i],@"^OFXHEADER"))
+                if (Regex.IsMatch(alldata[i], @"^OFXHEADER") | Regex.IsMatch(alldata[i], @"^<OFX"))
                 {
                     while ((alldata[i] != "<STMTTRN>") && (i < alldata.Length))
                     {
@@ -89,9 +89,15 @@ namespace OFX2Lets
                         else if (alldata[i].StartsWith("<FITID>"))
                             amountdata[k].fitid = Regex.Replace(alldata[i], @"<FITID>", "");
                         else if (alldata[i].StartsWith("<NAME>"))
+                        {
                             amountdata[k].shop = Regex.Replace(alldata[i], @"<NAME>", "");
+                            amountdata[k].shop = Regex.Replace(amountdata[k].shop, @"</NAME>", "");
+                        }
                         else if (alldata[i].StartsWith("<MEMO>"))
+                        {
                             amountdata[k].comment = Regex.Replace(alldata[i], @"<MEMO>", "");
+                            amountdata[k].comment = Regex.Replace(amountdata[k].comment, @"</MEMO>", "");
+                        }
                         i++;                        
                     }
                     k++;
@@ -205,9 +211,9 @@ namespace OFX2Lets
             conv_data = data;
             if (conv_data != null)
             {
-                conv_data = CSharp.Japanese.Kanaxs.Kana.ToHankaku(conv_data);
-                conv_data = CSharp.Japanese.Kanaxs.Kana.ToZenkakuKana(conv_data);
-                if (Regex.IsMatch(conv_data,@"[^a-zA-Z]-"))
+                //conv_data = CSharp.Japanese.Kanaxs.Kana.ToHankaku(conv_data);
+                //conv_data = CSharp.Japanese.Kanaxs.Kana.ToZenkakuKana(conv_data);
+                if (Regex.IsMatch(conv_data,@"[^a-zA-Z0-9]-.+"))
                 {
                     conv_data.Replace('-', 'ー');
                 }
@@ -230,8 +236,8 @@ namespace OFX2Lets
                 writefile.WriteLine("\t<DTPOSTED>" + eachdata.date);
                 writefile.WriteLine("\t<TRNAMT>" + eachdata.payment);
                 writefile.WriteLine("\t<FITID>" + eachdata.fitid);
-                writefile.WriteLine("\t<NAME>" + eachdata.shop);
-                writefile.WriteLine("\t<MEMO>" + eachdata.comment);
+                writefile.WriteLine("\t<NAME>" + eachdata.comment);
+                writefile.WriteLine("\t<MEMO>" + eachdata.shop);
                 writefile.WriteLine("</STMTTRN>");
             }
             foreach (string line in footdata)
